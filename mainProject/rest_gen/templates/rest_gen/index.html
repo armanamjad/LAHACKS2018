@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <title>'Food Adventure App'</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-</head>
+    <head>
+        <title>Food Adventure App</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?callback=myMap"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    </head>
 
 <body>
   
@@ -26,15 +26,134 @@
 </div>
 
 <!--Food Options Radio Buttons-->
+<!--Dropdown address-->
+<form class="form-inline">
+    
+ </form>
 
+  
 
-<form method = "POST">
+<form class = "formal" method = "POST">
     {% csrf_token %}
-        {{form}}
-    <input type = "submit" value = "submit">
+    <div class="form-group form-group-lg">
+        <label for = "id_location">Location: </label>
+        {{form.location}}
+    </div>
+    <div class = "fieldWrapper">
+        <label for = "id_distance">Maximum distance in miles: </label>
+        {{form.distance}}
+    </div>
+    <div class = "fieldWrapper">
+        <label for = "id_meals">Meals: </label>
+        {{form.meal}}
+    </div>
+    <div class = "fieldWrapper">
+            <label for = "id_cuisine">Cuisines: </label>
+            {{form.cuisine}}
+        </div>
+    
+    <p><input type = "submit" value = "submit"></p>
 </form>
 
 </form>
+
+
+
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta charset="utf-8">
+  <style>
+
+  </style>
+  <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+  <style>
+    .formal{
+        margin-left: 50px;
+    }
+    .fieldWrapper{
+        margin-left: 50px;
+        
+    }
+    #location {
+      /*position: absolute;*/
+      top: 0px;
+      left: 0px;
+      width: 50%;
+      height: 30px;
+    }
+
+
+  </style>
+  </head>
+
+  <body>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+
+
+
+
+    <script>
+      // This example displays an address form, using the autocomplete feature
+      // of the Google Places API to help users fill in the information.
+
+      // This example requires the Places library. Include the libraries=places
+      // parameter when you first load the API. For example:
+      // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
+
+      var placeSearch, autocomplete;
+      var componentForm = {
+        street_number: 'short_name',
+        route: 'long_name',
+        locality: 'long_name',
+        administrative_area_level_1: 'short_name',
+        country: 'long_name',
+        postal_code: 'short_name'
+      };
+
+      var onLoaded = function(){
+          var location_input = document.getElementById('location');
+          var autocomplete = new google.maps.places.Autocomplete(location_input);
+      }
+
+      function initAutocomplete() {
+        // Create the autocomplete object, restricting the search to geographical
+        // location types.
+        autocomplete = new google.maps.places.Autocomplete(
+            /** @type {!HTMLInputElement} */(document.getElementById('location')),
+          { types: ['geocode'] });
+
+        // When the user selects an address from the dropdown, populate the address
+        // fields in the form.
+        autocomplete.addListener('place_changed', fillInAddress);
+      }
+
+      // Bias the autocomplete object to the user's geographical location,
+      // as supplied by the browser's 'navigator.geolocation' object.
+      function geolocate() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function (position) {
+            var geolocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            var circle = new google.maps.Circle({
+              center: geolocation,
+              radius: position.coords.accuracy
+            });
+            autocomplete.setBounds(circle.getBounds());
+          });
+        }
+      }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfMcyvOrWHHdcHG3MGlTGvJXtyRd16OGA&libraries=places&callback=initAutocomplete"
+      async defer></script>
+  </body>
 
 </body>
 </html>
