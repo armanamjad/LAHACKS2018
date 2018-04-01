@@ -6,17 +6,6 @@ from foodTripClasses import Place
 ZOMATO_API_KEY = 'a7067b73018e25cbaa491cb3964081c6'
 BASE_ZOMATO_URL = 'https://developers.zomato.com/api/v2.1'
 
-#Not using anymore
-def get_result(url: str) -> dict:
-    response = None
-    try:
-        response = urllib.request.urlopen(url)
-        json_text = response.read().decode(encoding = 'utf-8')
-        return json.loads(json_text)
-    finally:
-        if response != None:
-            response.close()
-
 #Returns json dictionary with data for categories
 def get_category_data():
     url = BASE_ZOMATO_URL + '/categories'

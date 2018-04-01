@@ -3,19 +3,14 @@ import json
 class FoodTrip:
     def __init__(self, jsonFile = None):
         self.jsonFile = jsonFile
-        
         # duration is in seconds
         self.duration = jsonFile['routes'][0]['legs'][0]['duration']['value']
-        
         # distance is in meters
         self.totalDistance = jsonFile['routes'][0]['legs'][0]['distance']['value']
-        
         # key = name of place, value = 
         self.places = []
-        
         self.startingPoint = None
         self.endingPoint = None
-        
         self.htmlInstructions = None
         
     def insertPlace(self, name, address, score, category):
@@ -37,7 +32,12 @@ class Place:
         self.address = address
         self.score = score
         self.category = category
-        
     def print(self):
         print(self.name + " " + self.address)
+    def getName(self):
+        return self.name
+    def getAddress(self):
+        return self.address
+    def getScore(self):
+        return self.score
         
