@@ -252,6 +252,8 @@ def generatePlaces(info):
             i+=1
         else:
             category_info[x] = None
+    category_info.append(mapImgUrl)
+    
     return category_info
 
 def main():
