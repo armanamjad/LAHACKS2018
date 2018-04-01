@@ -41,7 +41,7 @@ def results(request):
     addressList = []
     urls = []
     # 1 is breakfast, 2 is lunch, 3 is dinner
-    for i in range(0,2):
+    for i in range(0,3):
         nameList.append(places[i].name)
         addressList.append(places[i].address)
         urls.append(places[i].imageUrl)
