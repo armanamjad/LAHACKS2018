@@ -145,11 +145,6 @@ def main():
     if _testing:
         _test()
     
-<<<<<<< HEAD
-    refinedList = getRestaurants()
-    for place in refinedList:
-        print(place.name)
-=======
 #     categories = ["Breakfast", "Lunch", "Dinner"]
 #     listOflistOfPlaces = zomato_data.get_restaurants_in_city("Orange County", categories)
 #     startingPlace = Place("Location 1", 
@@ -158,9 +153,8 @@ def main():
 #     refinedList = processListData(listOflistOfPlaces, startingPlace)
 #     for place in refinedList:
 #         print(place.name)
-    lat, lng = getLatLong("5507 Don Rodolfo San Jose, CA")
-    print(lat, lng)
+    # lat, lng = getLatLong("5507 Don Rodolfo San Jose, CA")
+    # print(lat, lng)
 
->>>>>>> f9b8babcc43b947f44b924b44ee7d17731f714cb
     
 main()

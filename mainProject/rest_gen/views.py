@@ -12,20 +12,28 @@ def index(request):
     location = ""
     distance = 0
     if request.method == 'POST':
-        input = ( request.POST.get('location', None), request.POST.get('distance', None) )
-
-        return HttpResponseRedirect('results/')
+        loc = request.POST.get('location', None)
+        dis = request.POST.get('distance', None)
+        b = request.POST.get('b', None)
+        l = request.POST.get('l', None)
+        d = request.POST.get('d', None)
+        input = ( loc, dis, b, l, d )
+        request.session['data'] = input
+        return HttpResponseRedirect('loading/')
     else:
         form = LocationForm()    
     context = {'location':location,'distance':distance,'form' : form }
     return render(request, 'rest_gen/index.html', context)
 
 def loading(request):
-    context = {}
+    data = request.session['data']
+    context = {'data':data}
+    #restaurants = request.session['rest']
     return render(request, 'rest_gen/loading.html', context)
 
 def results(request):
-    context = {}
+   # restList = request.session['rest']
+
     return render(request, 'rest_gen/results.html', context)
 
 def detail(request, restaurant_id):

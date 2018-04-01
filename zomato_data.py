@@ -84,13 +84,4 @@ for rl in restaurants:
         print('name:\t' + r.name + '\taddress:\t' + r.address + '\tscore:\t' + str(r.score))
     print()
     print()
-<<<<<<< HEAD
 '''
-=======
-'''
-#print(get_category_list())
-'''
-for k, v in get_cuisine_dict('Stockton').items():
-    print(k, v)
-    '''
->>>>>>> f9b8babcc43b947f44b924b44ee7d17731f714cb
