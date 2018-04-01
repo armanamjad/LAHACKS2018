@@ -6,7 +6,7 @@ import random
 from foodTripClasses import FoodTrip
 from foodTripClasses import Place
 from _random import Random
-apiKey = "key=AIzaSyCf6FC2ZTf-gFn3cvptcowZl_jwaGaZclY"
+apiKey = "key=AIzaSyCR0MK8AsrhicE-TGn366RDbuKkQ1RgVRg"
 googleMapImgApi = "key=AIzaSyB72MtN4g3WeFk6WNH3fM08_M_nGCAmYsk"
 _testing = False
 
@@ -247,7 +247,7 @@ def main():
         startingPlace = Place("Location 1", 
                                       "5507 Don Rodolfo Ct, San Jose, CA 95123")
         categories = ["Breakfast", "Lunch", "Dinner"]
-        cuisineList = ["Bubble Tea", "Tea"]
+        cuisineList = ["Pizza", "Mexican"]
          
         startingPlace.lat, startingPlace.lng = getLatLng(startingPlace.address)
          
@@ -270,5 +270,5 @@ def main():
               str(time[1]) + " hours " + str(time[2]) + " minutes")
         print("Total distance in miles is " + str(convertMetersToMiles(totalDistance)))
     
-main()
+# main()
 
