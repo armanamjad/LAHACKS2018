@@ -68,7 +68,7 @@ def rm_far_restaurants(restaurants: list, lat, lng, radius: int):
             if(latlng_to_distance(lat, lng, r.lat, r.lng) < radius):
                 new_list[i].append(r)
         i+=1
-        new_list[i] = []
+        new_list.append([])
     return new_list
     
 #Returns list of lists of restaurants, one list per category
