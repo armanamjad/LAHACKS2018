@@ -2,13 +2,16 @@ import json
 import urllib.parse
 import urllib.request
 import zomato_data
+import random
 from foodTripClasses import FoodTrip
 from foodTripClasses import Place
+from _random import Random
 apiKey = "key=AIzaSyCf6FC2ZTf-gFn3cvptcowZl_jwaGaZclY"
+googleMapImgApi = "key=AIzaSyB72MtN4g3WeFk6WNH3fM08_M_nGCAmYsk"
 _testing = False
 
 
-def createUrl(org: str, dest: str, wayPoints: list = None):
+def createUrl(org: str, dest: str, wayPoints: list = []):
     # Formatting
     org = org.replace(" ", "+")
     dest = dest.replace(" ", "+")
@@ -17,15 +20,39 @@ def createUrl(org: str, dest: str, wayPoints: list = None):
     url = "https://maps.googleapis.com/maps/api/directions/json?"
     origin = "origin=" + org
     destination = "destination=" + dest
-    waypoints = "waypoints=optimize:true|"
+    waypts = "waypoints="
     
-    
-    
-    if len(waypoints) == 0:
+    if len(wayPoints) == 0:
         return url + origin + "&" + destination + "&" + apiKey
     else:
-        return url + origin + "&" + destination + "&" + waypoints + "&" + apiKey
-
+        for waypoint in wayPoints:
+            waypts += ":via"
+            waypts += waypoint.address.replace(" ", "+")
+            waypts += "|"
+        
+        waypts = waypts[:-1]
+        return url + origin + "&" + destination + "&" + waypts + "&" + apiKey
+    
+def createMapImgUrl(org: str, dest: str, wayPoints: list = []):
+    org = org.replace(" ", "+")
+    dest = dest.replace(" ", "+")
+    
+    url = "https://www.google.com/maps/embed/v1/directions?" + googleMapImgApi
+    origin = "origin=" + org
+    destination = "destination=" + dest
+    waypts = "waypoints="
+    
+    if len(wayPoints) == 0:
+        return url + origin + "&" + destination + "&" + apiKey
+    else:
+        for waypoint in wayPoints:
+            waypts += waypoint.address.replace(" ", "+")
+            waypts += waypoint.address.replace("Avenue", "Ave")
+            waypts += "|"
+        
+        waypts = waypts[:-1]
+        return url + "&" + origin + "&" + destination + "&" + waypts
+    
 def getResult(url):
     response = None
     
@@ -92,18 +119,16 @@ def findClosestDestination(places: list, origin: Place, visitedPlaces):
 # filterDuration is a set with a bool and int seconds
 # filterMiles is a set with a bool and int miles
 # data is a list of lists of places
-def processListData(data: list, origin, 
-                    filterDuration = False, duration = 0, filterMiles = False, miles = 0):
-#     refinedData = data
-#     if filterDuration:
-#         for l in data:
-#             l = filterPlacesByDuration(l, origin, duration)
-#     if filterMiles:
-#         for l in data:
-#             l = filterPlacesByMiles(l, origin, miles)
+def processListData(data: list, origin, randomStartingPoint = False, filterDuration = False, 
+                    duration = 0, filterMiles = False, miles = 0):
+
     places = []
-    places.append(data[0][0])
-    recentPlace = data[0][0]
+    # randomly generates an index so that starting place will be random
+    index = 0
+    if randomStartingPoint:
+        index = random.randrange(0, len(data[0]))
+    places.append(data[0][index])
+    recentPlace = data[0][index]
     data.remove(data[0])
     for listOfPlaces in data:
         # gets closest place to the most recent place added to places
@@ -111,20 +136,78 @@ def processListData(data: list, origin,
         places.append(closestPlace)
         recentPlace = closestPlace
     return places
+
+# convert meters to miles
+def convertMetersToMiles(meters):
+    return meters / 1609.34
+
+# convert seconds to days hours minutes
+def convertSecondsToDHM(seconds):
+    days = int(seconds/86400)
+    remaining = seconds%86400
+    hours = int(remaining/3600)
+    remaining = remaining%3600
+    minutes = int(remaining/60)
+    return days, hours, minutes
+
+def getFullTripStats(places: list, originAddress: str):
+    # gets rid of beginning and ending of the places list
+    copyOfPlaces = []
+    for num in range(0, len(places) - 1):
+        copyOfPlaces.append(places[num])
+#     copyOfPlaces.pop(len(copyOfPlaces) - 1)
+    jsonFile = getResult(createUrl(originAddress, places[len(places) - 1].address, copyOfPlaces))
+    time = 0
+    for leg in jsonFile['routes'][0]['legs']:
+        time += int(leg['duration']['value'])
+    distance = 0
+    for leg in jsonFile['routes'][0]['legs']:
+        distance += int(leg['distance']['value'])
     
-def getLatLong(address):
+#     print(json.dumps(jsonFile))
+    foodTrip = FoodTrip(jsonFile)
+    mapImgUrl = createMapImgUrl(originAddress, places[len(places) - 1].address, copyOfPlaces)
+    return time, distance, mapImgUrl
+
+def getLatLng(address):
     tempjsonFile = getResult(createUrl(address, address))
-    tempFoodTrip = FoodTrip(tempjsonFile)
-    latlong = tempjsonFile['routes'][0]['legs'][0]['steps'][0]['start_location']
-    return latlong["lat"], latlong["lng"]
+#     print(json.dumps(tempjsonFile))
+    latLng = tempjsonFile['routes'][0]['legs'][0]['steps'][0]['start_location']
+    return latLng["lat"], latLng["lng"]
 
 def _test():
-    startingPlace = Place("Starting point", "Fresno, CA")
-    place1 = Place("Location 1", "San Jose, CA")
-    place2 = Place("Location 2", "Los Angeles, CA")
-    place3 = Place("Location 3", "Irvine, CA")
-     
-    listOfPlaces = [place1, place2, place3]
+#     jsonFile = getResult("https://maps.googleapis.com/maps/api/directions/json?origin=Boston,MA&destination=Concord,MA&waypoints=Charlestown,MA|Lexington,MA&key=")
+    org = Place("1", "5507 Don Rodolfo Ct, San Jose, CA 95123")
+    place1 = Place("2", "140 E San Carlos St, San Jose, CA 95112")
+    place2 = Place("3", "302 S Market St, San Jose, CA 95113")
+    dest = Place("4", "505 E San Carlos St, San Jose, CA 95112")
+    print(createUrl(org.address, dest.address, 
+                                   [place1, place2]))
+    jsonFile = getResult(createUrl(org.address, dest.address, 
+                                   [place1, place2]))
+#     print(json.dumps(jsonFile))
+    trip = FoodTrip(jsonFile)
+    totalDistance = trip.totalDistance
+    t = 0
+    for leg in jsonFile['routes'][0]['legs']:
+        t += int(leg['duration']['value'])
+    time = convertSecondsToDHM(t)
+    print("Total time of the trip is " + str(time[0]) + " days " + 
+              str(time[1]) + " hours " + str(time[2]) + " minutes")
+    print("Total distance in miles is " + str(convertMetersToMiles(totalDistance)))
+#     startingPlace = Place("Starting point", "Fresno, CA")
+#     place1 = Place("Location 1", "San Jose, CA")
+#     place2 = Place("Location 2", "Los Angeles, CA")
+#     place3 = Place("Location 3", "Irvine, CA")
+#     place4 = Place("Location 4", "San Francisco, C             dc  cfx5r cfdcfdcfd cfdfdcdfgr454eA")
+#      
+#     wayPoints = [place1, place2, place3, place4]
+#     totalTime, totalDistance = getFullTripStats(wayPoints, startingPlace.address)
+#     time = convertSecondsToDHM(totalTime)
+#     print("Total time of the trip is " + str(time[0]) + " days " + 
+#               str(time[1]) + " hours " + str(time[2]) + " minutes")
+#     print("Total distance in miles is " + str(convertMetersToMiles(totalDistance)))
+    
     
 #     filteredPlaces = filterPlacesByDuration(listOfPlaces, startingPlace, 30000)
 #     filteredPlaces = filterPlacesByMiles(listOfPlaces, startingPlace, 353910/1609.344)
@@ -135,26 +218,57 @@ def _test():
 #     jsonFile = getResult(createUrl("Chicago,IL", "Los Angeles,CA"))
 #     print(json.dumps(jsonFile))
 
-def getRestaurants():
-    categories = ["Breakfast", "Lunch", "Dinner"]
-    listOflistOfPlaces = zomato_data.get_restaurants_in_city("Irvine", categories)
-    startingPlace = Place("Location 1", "1043 West Peltason Dr Irvine, CA")
-    return processListData(listOflistOfPlaces, startingPlace)
+def generatePlaces(info):
+    startingAddress = info[0]
+    distance = info[1]
+    categories = info[2]
+    cuisineList = info[3]
+    city = zomato_data.get_city_name(startingAddress)
+    
+    startingPlace = Place("Starting place", startingAddress)
+    startingPlace.lat, startingPlace.lng = getLatLng(startingPlace.address)
+        
+    listOflistOfPlaces = zomato_data.get_restaurants_in_city(city, categories, 
+                                                             cuisines = cuisineList)
+    listOflistOfPlaces = zomato_data.rm_far_restaurants(listOflistOfPlaces, 
+                                                            startingPlace.lat, 
+                                                            startingPlace.lng, distance)
+    refinedList = processListData(listOflistOfPlaces, startingPlace, True)
+    
+    totalTime, totalDistance, mapImgUrl = getFullTripStats(refinedList, startingPlace.address)
+    time = convertSecondsToDHM(totalTime)
+    
+    return refinedList
 
 def main():
     if _testing:
         _test()
-    
-#     categories = ["Breakfast", "Lunch", "Dinner"]
-#     listOflistOfPlaces = zomato_data.get_restaurants_in_city("Orange County", categories)
-#     startingPlace = Place("Location 1", 
-#                                   "1043 West Peltason Dr Irvine, CA")
-#     
-#     refinedList = processListData(listOflistOfPlaces, startingPlace)
-#     for place in refinedList:
-#         print(place.name)
-    # lat, lng = getLatLong("5507 Don Rodolfo San Jose, CA")
-    # print(lat, lng)
-
+    else:
+        startingPlace = Place("Location 1", 
+                                      "5507 Don Rodolfo Ct, San Jose, CA 95123")
+        categories = ["Breakfast", "Lunch", "Dinner"]
+        cuisineList = ["Bubble Tea", "Tea"]
+         
+        startingPlace.lat, startingPlace.lng = getLatLng(startingPlace.address)
+         
+        listOflistOfPlaces = zomato_data.get_restaurants_in_city("Los Angeles", categories,
+                                                                 cuisines=cuisineList)
+        listOflistOfPlaces = zomato_data.rm_far_restaurants(listOflistOfPlaces, 
+                                                            startingPlace.lat, 
+                                                            startingPlace.lng, 1000000000)
+              
+        refinedList = processListData(listOflistOfPlaces, startingPlace, True)
+        for place in refinedList:
+            if not place.imageUrl == "":
+                print(place.address, place.imageUrl)
+            else:
+                print(place.name + " does not have an image")
+           
+        totalTime, totalDistance, mapImgUrl = getFullTripStats(refinedList, startingPlace.address)
+        time = convertSecondsToDHM(totalTime)
+        print("Total time of the trip is " + str(time[0]) + " days " + 
+              str(time[1]) + " hours " + str(time[2]) + " minutes")
+        print("Total distance in miles is " + str(convertMetersToMiles(totalDistance)))
     
 main()
+
