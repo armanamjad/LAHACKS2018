@@ -246,7 +246,7 @@ def generatePlaces(info):
     totalTime, totalDistance, mapImgUrl = getFullTripStats(refinedList, startingPlace.address)
     time = convertSecondsToDHM(totalTime)
     i = 0
-    for x in range (category_info):
+    for x in range (len(category_info)):
         if(category_info[x]):
             category_info[x] = refinedList[i]
             i+=1
