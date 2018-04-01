@@ -4,7 +4,7 @@ import requests
 import math
 from foodTripClasses import Place
 
-ZOMATO_API_KEY = 'a7067b73018e25cbaa491cb3964081c6'
+ZOMATO_API_KEY = 'bc2be972d9dca5ccff701e7d84b7a221'
 BASE_ZOMATO_URL = 'https://developers.zomato.com/api/v2.1'
 
 #Returns json dictionary with data for categories
@@ -71,7 +71,20 @@ def rm_far_restaurants(restaurants: list, lat, lng, radius: int):
         new_list.append([])
     new_list.pop(len(new_list)-1)
     return new_list
-    
+
+def get_city_name(address: str):
+    for i in range(len(address)):
+        if address[i] == ',':
+            break
+    city = ''
+    for j in range(i+2, len(address)):
+        if address[j].isdigit():
+            break
+        else:
+            city += address[j]
+    city = city[:-4]
+    return city
+
 #Returns list of lists of restaurants, one list per category
 def get_restaurants_in_city(city: str, categories: list, sort = "rating", order = 'desc', cuisines = []):
     cuis_ids = []
@@ -96,7 +109,7 @@ def get_restaurants_in_city(city: str, categories: list, sort = "rating", order 
         restaurants = []
         for r in [restaurant['restaurant'] for restaurant in data['restaurants']]:
             score = int(float(r['user_rating']['aggregate_rating']) * 10)
-            restaurants.append(Place(r['name'], r['location']['address'], score, lat = float(r['location']['latitude']), lng = float(r['location']['longitude'])))
+            restaurants.append(Place(r['name'], r['location']['address'], score, lat = float(r['location']['latitude']), lng = float(r['location']['longitude']), imageUrl = r['featured_image']))
         restaurants_list.append(restaurants)
     return restaurants_list
 
@@ -109,11 +122,8 @@ for rl in restaurants:
     print()
     print()
 '''
-<<<<<<< HEAD
-=======
 #print(get_category_list())
 '''
 for k, v in get_cuisine_dict('Stockton').items():
     print(k, v)
     '''
->>>>>>> 890e955235fa0078631fa5b9293611627a40f0b0
