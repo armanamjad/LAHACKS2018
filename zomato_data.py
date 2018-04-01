@@ -69,6 +69,7 @@ def rm_far_restaurants(restaurants: list, lat, lng, radius: int):
                 new_list[i].append(r)
         i+=1
         new_list.append([])
+    new_list.pop(len(new_list)-1)
     return new_list
     
 #Returns list of lists of restaurants, one list per category
