@@ -26,6 +26,10 @@ def get_category_data():
         data = new_request.json()
     return data
 
+#Returns list of cuisines on zomato
+#def get_cuisine_list():
+    
+
 #Returns id number of given category name
 def get_category_id(category: str):
     data = get_category_data()
@@ -45,14 +49,17 @@ def get_city_id(city_name: str):
     return data['location_suggestions'][0]['id']
 
 #Returns list of lists of restaurants, one list per category
-def get_restaurants_in_city(city: str, categories: list):
+
+def get_restaurants_in_city(city: str, categories: list, lat, lon, sort = "rating", order = "desc", radius = 15):
     cat_ids = []
     for c in categories:
         cat_ids.append(str(get_category_id(c)))
     restaurants_list = []
     for c in cat_ids:
         data = None
-        query_parameters = [('entity_id', get_city_id(city)), ('entity_type', 'city'), ('category', c), ('sort', 'rating'), ('count', 5)]
+        if(sort == "cost"):
+            order = "asc"
+        query_parameters = [('entity_id', get_city_id(city)), ('entity_type', 'city'), ('category', c), ('sort', sort), ('count', 5), ('order', order), ('lat', lat), ('lon', lon), ('radius', radius)]
         url = BASE_ZOMATO_URL + '/search?'+ urllib.parse.urlencode(query_parameters)
         new_request = requests.get(url, headers={'user-key' : ZOMATO_API_KEY})
         if new_request.ok:
@@ -66,7 +73,7 @@ def get_restaurants_in_city(city: str, categories: list):
 
 #tests
 '''
-restaurants = get_restaurants_in_city('San Jose', ['Breakfast', 'Lunch', 'Dinner'])
+restaurants = get_restaurants_in_city('San Jose', ['Breakfast', 'Lunch', 'Dinner'], 'cost', 37.2539602, -121.8415602)
 for rl in restaurants:
     for r in rl:
         print('name:\t' + r.name + '\taddress:\t' + r.address + '\tscore:\t' + str(r.score))
