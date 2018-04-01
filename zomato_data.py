@@ -61,10 +61,14 @@ def latlng_to_distance(lat1, lng1, lat2, lng2):
 
 #Removes all restaurants farther than the radius
 def rm_far_restaurants(restaurants: list, lat, lng, radius: int):
-    new_list = []
-    for r in restaurants:
-        if(latlng_to_distance(lat, lng, r.lat, r.lng) < radius):
-            new_list.append(r)
+    new_list = [[]]
+    i = 0
+    for rl in restaurants:
+        for r in rl:
+            if(latlng_to_distance(lat, lng, r.lat, r.lng) < radius):
+                new_list[i].append(r)
+        i++
+        new_list[i] = []
     return new_list
     
 #Returns list of lists of restaurants, one list per category
