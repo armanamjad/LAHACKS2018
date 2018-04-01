@@ -52,7 +52,7 @@ def get_restaurants_in_city(city: str, categories: list):
     restaurants_list = []
     for c in cat_ids:
         data = None
-        query_parameters = [('entity_id', get_city_id(city)), ('entity_type', 'city'), ('category', c), ('sort', 'rating')]
+        query_parameters = [('entity_id', get_city_id(city)), ('entity_type', 'city'), ('category', c), ('sort', 'rating'), ('count', 5)]
         url = BASE_ZOMATO_URL + '/search?'+ urllib.parse.urlencode(query_parameters)
         new_request = requests.get(url, headers={'user-key' : ZOMATO_API_KEY})
         if new_request.ok:
@@ -65,11 +65,11 @@ def get_restaurants_in_city(city: str, categories: list):
     return restaurants_list
 
 #tests
-'''
+
 restaurants = get_restaurants_in_city('San Jose', ['Breakfast', 'Lunch', 'Dinner'])
 for rl in restaurants:
     for r in rl:
         print('name:\t' + r.name + '\taddress:\t' + r.address + '\tscore:\t' + str(r.score))
     print()
     print()
-'''
+
