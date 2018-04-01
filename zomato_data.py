@@ -1,6 +1,7 @@
 import json
 import urllib.parse
 import requests
+import math
 from foodTripClasses import Place
 
 ZOMATO_API_KEY = 'a7067b73018e25cbaa491cb3964081c6'
@@ -48,6 +49,29 @@ def get_city_id(city_name: str):
         data = new_request.json()
     return data['location_suggestions'][0]['id']
 
+#Calculates the distance between two latlong pairs
+def latlng_to_distance(lat1, lng1, lat2, lng2):
+    lat1 = math.radians(lat1)
+    lat2 = math.radians(lat2)
+    lng1 = math.radians(lng1)
+    lng2 = math.radians(lng2)
+    a = math.pow(math.sin((lat1-lat2)/2), 2) + math.cos(lat1)*math.cos(lat2)* math.pow(math.sin((lng1 - lng2)/2), 2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return 6371 * c
+
+#Removes all restaurants farther than the radius
+def rm_far_restaurants(restaurants: list, lat, lng, radius: int):
+    new_list = [[]]
+    i = 0
+    for rl in restaurants:
+        for r in rl:
+            if(latlng_to_distance(lat, lng, r.lat, r.lng) < radius):
+                new_list[i].append(r)
+        i+=1
+        new_list.append([])
+    new_list.pop(len(new_list)-1)
+    return new_list
+    
 #Returns list of lists of restaurants, one list per category
 def get_restaurants_in_city(city: str, categories: list, sort = "rating", order = 'desc', cuisines = []):
     cuis_ids = []
@@ -64,7 +88,7 @@ def get_restaurants_in_city(city: str, categories: list, sort = "rating", order 
         data = None
         if(sort == "cost"):
             order = "asc"
-        query_parameters = [('entity_id', get_city_id(city)), ('entity_type', 'city'), ('category', c), ('sort', sort), ('count', 6), ('order', order), ('cuisines', cuisine)]
+        query_parameters = [('entity_id', get_city_id(city)), ('entity_type', 'city'), ('category', c), ('sort', sort), ('count', 20), ('order', order), ('cuisines', cuisine)]
         url = BASE_ZOMATO_URL + '/search?'+ urllib.parse.urlencode(query_parameters)
         new_request = requests.get(url, headers={'user-key' : ZOMATO_API_KEY})
         if new_request.ok:
@@ -72,7 +96,7 @@ def get_restaurants_in_city(city: str, categories: list, sort = "rating", order 
         restaurants = []
         for r in [restaurant['restaurant'] for restaurant in data['restaurants']]:
             score = int(float(r['user_rating']['aggregate_rating']) * 10)
-            restaurants.append(Place(r['name'], r['location']['address'], score))
+            restaurants.append(Place(r['name'], r['location']['address'], score, lat = float(r['location']['latitude']), lng = float(r['location']['longitude'])))
         restaurants_list.append(restaurants)
     return restaurants_list
 
@@ -85,3 +109,11 @@ for rl in restaurants:
     print()
     print()
 '''
+<<<<<<< HEAD
+=======
+#print(get_category_list())
+'''
+for k, v in get_cuisine_dict('Stockton').items():
+    print(k, v)
+    '''
+>>>>>>> 890e955235fa0078631fa5b9293611627a40f0b0
