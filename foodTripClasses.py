@@ -32,12 +32,16 @@ class FoodTrip:
             index += 1
     
 class Place:
-    def __init__(self, name, address, score = 0, category = "", imageUrl = ""):
+    def __init__(self, name, address, score = 0, category = "", imageUrl = "",
+                 lat = 0, lng = 0):
         self.name = name
         self.address = address
         self.score = score
         self.category = category
         self.imageUrl = imageUrl
+        self.lat = lat
+        self.lng = lng
         
     def print(self):
         print(self.name + " " + self.address)
+        
