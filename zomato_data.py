@@ -114,14 +114,14 @@ def get_restaurants_in_city(city: str, categories: list, sort = "rating", order 
     return restaurants_list
 
 #tests
-
+'''
 restaurants = get_restaurants_in_city('San Jose', ['Breakfast', 'Lunch', 'Dinner'])
 for rl in restaurants:
     for r in rl:
         print('name:\t' + r.name + '\taddress:\t' + r.address + '\tscore:\t' + str(r.score))
     print()
     print()
-
+'''
 #print(get_category_list())
 '''
 for k, v in get_cuisine_dict('Stockton').items():
