@@ -1,0 +1,3 @@
+<input type="radio" name="usersegment" value="non-paying" {% if usersegment == "non-paying" %}checked="checked"{% endif %}/> Non-paying Users <br />
+<input type="radio" name="usersegment" value="paying" {% if usersegment == "paying" %}checked="checked"{% endif %}/> Paying Users <br />
+<input type="radio" name="usersegment" value="all" {% if usersegment == "all" or not usersegment %}checked="checked"{% endif %}/> All Users<br />
