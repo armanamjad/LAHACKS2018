@@ -64,7 +64,7 @@ def get_restaurants_in_city(city: str, categories: list, sort = "rating", order 
         data = None
         if(sort == "cost"):
             order = "asc"
-        query_parameters = [('entity_id', get_city_id(city)), ('entity_type', 'city'), ('category', c), ('sort', sort), ('count', 5), ('order', order), ('cuisines', cuisine)]
+        query_parameters = [('entity_id', get_city_id(city)), ('entity_type', 'city'), ('category', c), ('sort', sort), ('count', 6), ('order', order), ('cuisines', cuisine)]
         url = BASE_ZOMATO_URL + '/search?'+ urllib.parse.urlencode(query_parameters)
         new_request = requests.get(url, headers={'user-key' : ZOMATO_API_KEY})
         if new_request.ok:
