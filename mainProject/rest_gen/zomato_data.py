@@ -2,7 +2,7 @@ import json
 import urllib.parse
 import requests
 import math
-from foodTripClasses import Place
+from .foodTripClasses import Place
 
 ZOMATO_API_KEY = 'bc2be972d9dca5ccff701e7d84b7a221'
 BASE_ZOMATO_URL = 'https://developers.zomato.com/api/v2.1'
@@ -109,7 +109,7 @@ def get_restaurants_in_city(city: str, categories: list, sort = "rating", order 
         restaurants = []
         for r in [restaurant['restaurant'] for restaurant in data['restaurants']]:
             score = int(float(r['user_rating']['aggregate_rating']) * 10)
-            restaurants.append(Place(r['name'], r['location']['address'], score, lat = float(r['location']['latitude']), lng = float(r['location']['longitude']), imageUrl = r['thumb']))
+            restaurants.append(Place(r['name'], r['location']['address'], score, lat = float(r['location']['latitude']), lng = float(r['location']['longitude'])))
         restaurants_list.append(restaurants)
     return restaurants_list
 

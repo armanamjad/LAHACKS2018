@@ -1,13 +1,12 @@
 import json
 import urllib.parse
 import urllib.request
-import zomato_data
+from . import zomato_data
 import random
-from foodTripClasses import FoodTrip
-from foodTripClasses import Place
+from .foodTripClasses import FoodTrip
+from .foodTripClasses import Place
 from _random import Random
-apiKey = "key=AIzaSyCR0MK8AsrhicE-TGn366RDbuKkQ1RgVRg"
-googleMapImgApi = "key=AIzaSyB72MtN4g3WeFk6WNH3fM08_M_nGCAmYsk"
+apiKey = "key=AIzaSyCf6FC2ZTf-gFn3cvptcowZl_jwaGaZclY"
 _testing = False
 
 
@@ -32,27 +31,7 @@ def createUrl(org: str, dest: str, wayPoints: list = []):
         
         waypts = waypts[:-1]
         return url + origin + "&" + destination + "&" + waypts + "&" + apiKey
-    
-def createMapImgUrl(org: str, dest: str, wayPoints: list = []):
-    org = org.replace(" ", "+")
-    dest = dest.replace(" ", "+")
-    
-    url = "https://www.google.com/maps/embed/v1/directions?" + googleMapImgApi
-    origin = "origin=" + org
-    destination = "destination=" + dest
-    waypts = "waypoints="
-    
-    if len(wayPoints) == 0:
-        return url + origin + "&" + destination + "&" + apiKey
-    else:
-        for waypoint in wayPoints:
-            waypts += waypoint.address.replace(" ", "+")
-            waypts += waypoint.address.replace("Avenue", "Ave")
-            waypts += "|"
-        
-        waypts = waypts[:-1]
-        return url + "&" + origin + "&" + destination + "&" + waypts
-    
+
 def getResult(url):
     response = None
     
@@ -156,6 +135,8 @@ def getFullTripStats(places: list, originAddress: str):
     for num in range(0, len(places) - 1):
         copyOfPlaces.append(places[num])
 #     copyOfPlaces.pop(len(copyOfPlaces) - 1)
+    print(createUrl(originAddress, places[len(places) - 1].address, copyOfPlaces))
+    print("xxxx " + places[len(places) - 1].address)
     jsonFile = getResult(createUrl(originAddress, places[len(places) - 1].address, copyOfPlaces))
     time = 0
     for leg in jsonFile['routes'][0]['legs']:
@@ -166,12 +147,11 @@ def getFullTripStats(places: list, originAddress: str):
     
 #     print(json.dumps(jsonFile))
     foodTrip = FoodTrip(jsonFile)
-    mapImgUrl = createMapImgUrl(originAddress, places[len(places) - 1].address, copyOfPlaces)
-    return time, distance, mapImgUrl
+    return time, distance
 
 def getLatLng(address):
     tempjsonFile = getResult(createUrl(address, address))
-#     print(json.dumps(tempjsonFile))
+    print(json.dumps(tempjsonFile))
     latLng = tempjsonFile['routes'][0]['legs'][0]['steps'][0]['start_location']
     return latLng["lat"], latLng["lng"]
 
@@ -222,39 +202,22 @@ def generatePlaces(info):
     startingAddress = info[0]
     distance = info[1]
     categories = info[2]
-    category_info = [False, False, False]
-    for c in categories:
-        if c == 'Breakfast':
-            category_info[0] = True
-        elif c == 'Lunch':
-            category_info[1] = True
-        elif c == 'Dinner':
-            category_info[2] = True
     cuisineList = info[3]
-    city = zomato_data.get_city_name(startingAddress)
     
     startingPlace = Place("Starting place", startingAddress)
     startingPlace.lat, startingPlace.lng = getLatLng(startingPlace.address)
         
-    listOflistOfPlaces = zomato_data.get_restaurants_in_city(city, categories, 
+    listOflistOfPlaces = zomato_data.get_restaurants_in_city("San Jose", categories, 
                                                              cuisines = cuisineList)
     listOflistOfPlaces = zomato_data.rm_far_restaurants(listOflistOfPlaces, 
                                                             startingPlace.lat, 
                                                             startingPlace.lng, distance)
     refinedList = processListData(listOflistOfPlaces, startingPlace, True)
     
-    totalTime, totalDistance, mapImgUrl = getFullTripStats(refinedList, startingPlace.address)
+    totalTime, totalDistance = getFullTripStats(refinedList, startingPlace.address)
     time = convertSecondsToDHM(totalTime)
-    i = 0
-    for x in range (len(category_info)):
-        if(category_info[x]):
-            category_info[x] = refinedList[i]
-            i+=1
-        else:
-            category_info[x] = None
-    category_info.append(mapImgUrl)
     
-    return category_info
+    return refinedList
 
 def main():
     if _testing:
@@ -263,24 +226,20 @@ def main():
         startingPlace = Place("Location 1", 
                                       "5507 Don Rodolfo Ct, San Jose, CA 95123")
         categories = ["Breakfast", "Lunch", "Dinner"]
-        cuisineList = ["Pizza", "Mexican"]
-         
+        cuisineList = ["Mexican", "Tea"]
+        
         startingPlace.lat, startingPlace.lng = getLatLng(startingPlace.address)
-         
-        listOflistOfPlaces = zomato_data.get_restaurants_in_city("Los Angeles", categories,
-                                                                 cuisines=cuisineList)
+        
+        listOflistOfPlaces = zomato_data.get_restaurants_in_city("San Jose", categories)
         listOflistOfPlaces = zomato_data.rm_far_restaurants(listOflistOfPlaces, 
                                                             startingPlace.lat, 
-                                                            startingPlace.lng, 1000000000)
-              
+                                                            startingPlace.lng, 10)
+             
         refinedList = processListData(listOflistOfPlaces, startingPlace, True)
         for place in refinedList:
-            if not place.imageUrl == "":
-                print(place.address, place.imageUrl)
-            else:
-                print(place.name + " does not have an image")
-           
-        totalTime, totalDistance, mapImgUrl = getFullTripStats(refinedList, startingPlace.address)
+            print(place.name, place.address)
+          
+        totalTime, totalDistance = getFullTripStats(refinedList, startingPlace.address)
         time = convertSecondsToDHM(totalTime)
         print("Total time of the trip is " + str(time[0]) + " days " + 
               str(time[1]) + " hours " + str(time[2]) + " minutes")
