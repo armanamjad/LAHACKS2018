@@ -1,10 +1,10 @@
 import json
 import urllib.parse
 import urllib.request
-import zomato_data
+from . import zomato_data
 import random
-from foodTripClasses import FoodTrip
-from foodTripClasses import Place
+from .foodTripClasses import FoodTrip
+from .foodTripClasses import Place
 from _random import Random
 apiKey = "key=AIzaSyCf6FC2ZTf-gFn3cvptcowZl_jwaGaZclY"
 _testing = False

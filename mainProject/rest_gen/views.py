@@ -6,6 +6,8 @@ from django.http import HttpResponseRedirect
 from .models import Restaurant, Way, Route
 from .models import use
 from .forms import LocationForm
+from .main import generatePlaces
+
 
 # Create your views here.
 def index(request):
@@ -18,30 +20,34 @@ def index(request):
             m = form.cleaned_data
         input = ( m )
         request.session['data'] = input
-        return HttpResponseRedirect('loading/')
+        return HttpResponseRedirect('results/')
     else:
         form = LocationForm()    
     context = {'location':location,'distance':distance,'form' : form }
     return render(request, 'rest_gen/index.html', context)
 
-def loading(request):
-    data = request.session['data']
-    context = {'data':data}
-    #restaurants = request.session['rest']
-    return render(request, 'rest_gen/loading.html', context)
+#5507 Don Rodolfo Ct, San Jose, CA 95123
 
 def results(request):
-   # restList = request.session['rest']
-    context = {}
-    return render(request, 'rest_gen/results.html', context)
+    dat = request.session['data']
+    #turn into normal list
+    data = [0,0,0,0]
+    data[0]= dat['location'] 
+    data[1]=dat['distance'] 
+    data[2]=dat['meal'] 
+    data[3]=dat['cuisine'] 
+    places = generatePlaces(data)
+    nameList = []
+    addressList = []
+    urls = []
+    # 1 is breakfast, 2 is lunch, 3 is dinner
+    for i in range(0,2):
+        nameList.append(places[i].name)
+        addressList.append(places[i].address)
+        urls.append(places[i].imageUrl)
 
-def detail(request, restaurant_id):
-    r = Restaurant.objects.get(pk = restaurant_id)
-    context = { 'name': r.m_name , 'address': r.m_address}
-    return render(request, 'rest_gen/detail.html', context)
-    
-def selection(request, choicelist : list, maxDist, start):
-    return 1
+    context = { 'name' : nameList, 'address' : addressList, 'url' : urls }
+    return render(request, 'rest_gen/results.html', context)
 
 
 
