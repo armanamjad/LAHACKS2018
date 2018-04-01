@@ -91,7 +91,7 @@ def get_restaurants_in_city(city: str, categories: list, sort = "rating", order 
         restaurants = []
         for r in [restaurant['restaurant'] for restaurant in data['restaurants']]:
             score = int(float(r['user_rating']['aggregate_rating']) * 10)
-            restaurants.append(Place(r['name'], r['location']['address'], score, lat = r['location']['latitude'], lng = r['location']['longitude']))
+            restaurants.append(Place(r['name'], r['location']['address'], score, lat = int(r['location']['latitude']), lng = int(r['location']['longitude'])))
         restaurants_list.append(restaurants)
     return restaurants_list
 
