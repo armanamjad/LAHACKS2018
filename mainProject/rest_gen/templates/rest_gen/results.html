@@ -64,13 +64,12 @@ function goBack() {
 } </style>
 
   <div class="left">
-    <h2>Breakfast?</h2>
-    <p>{{ name.0 }}</p>
-    <h2>Lunch?</h2>
-    <p>{{ name.1 }}</p>
-    <h2>Dinner?</h2>
-    <p> {{ name.2 }} </p>
-
+    {% for i in range(0,len(name)) %}
+        <div>
+            <h1>{{ meals.i }}</h1>
+            <p> {{name.i}} </p>
+        </div>
+    {% endfor %}
   </div>
 
 <div class = "container-fluid text-right">

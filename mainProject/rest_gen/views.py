@@ -46,7 +46,7 @@ def results(request):
         addressList.append(places[i].address)
         urls.append(places[i].imageUrl)
 
-    context = { 'name' : nameList, 'address' : addressList, 'url' : urls }
+    context = { 'name' : nameList, 'address' : addressList, 'url' : urls, 'meals' : ['Breakfast', 'Lunch', 'Dinner'] }
     return render(request, 'rest_gen/results.html', context)
 
 
