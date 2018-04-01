@@ -67,8 +67,9 @@ def rm_far_restaurants(restaurants: list, lat, lng, radius: int):
         for r in rl:
             if(latlng_to_distance(lat, lng, r.lat, r.lng) < radius):
                 new_list[i].append(r)
-        i++
-        new_list[i] = []
+        i+=1
+        new_list.append([])
+    new_list.pop(len(new_list)-1)
     return new_list
     
 #Returns list of lists of restaurants, one list per category
@@ -87,7 +88,7 @@ def get_restaurants_in_city(city: str, categories: list, sort = "rating", order 
         data = None
         if(sort == "cost"):
             order = "asc"
-        query_parameters = [('entity_id', get_city_id(city)), ('entity_type', 'city'), ('category', c), ('sort', sort), ('count', 50), ('order', order), ('cuisines', cuisine)]
+        query_parameters = [('entity_id', get_city_id(city)), ('entity_type', 'city'), ('category', c), ('sort', sort), ('count', 20), ('order', order), ('cuisines', cuisine)]
         url = BASE_ZOMATO_URL + '/search?'+ urllib.parse.urlencode(query_parameters)
         new_request = requests.get(url, headers={'user-key' : ZOMATO_API_KEY})
         if new_request.ok:
@@ -108,8 +109,11 @@ for rl in restaurants:
     print()
     print()
 '''
+<<<<<<< HEAD
+=======
 #print(get_category_list())
 '''
 for k, v in get_cuisine_dict('Stockton').items():
     print(k, v)
     '''
+>>>>>>> 890e955235fa0078631fa5b9293611627a40f0b0
