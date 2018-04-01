@@ -6,17 +6,6 @@ from foodTripClasses import Place
 ZOMATO_API_KEY = 'a7067b73018e25cbaa491cb3964081c6'
 BASE_ZOMATO_URL = 'https://developers.zomato.com/api/v2.1'
 
-#Not using anymore
-def get_result(url: str) -> dict:
-    response = None
-    try:
-        response = urllib.request.urlopen(url)
-        json_text = response.read().decode(encoding = 'utf-8')
-        return json.loads(json_text)
-    finally:
-        if response != None:
-            response.close()
-
 #Returns json dictionary with data for categories
 def get_category_data():
     url = BASE_ZOMATO_URL + '/categories'
@@ -25,6 +14,21 @@ def get_category_data():
     if new_request.ok:
         data = new_request.json()
     return data
+
+#Returns list of all the categories on zomato
+def get_category_list():
+    data = get_category_data()
+    return [c['categories']['name'] for c in data['categories']]
+
+#Returns dictionary with keys of cuisines on zomato whose values are the id's
+def get_cuisine_dict(city_name):
+    data = None
+    query_parameters = [('city_id', get_city_id(city_name))]
+    url = BASE_ZOMATO_URL + '/cuisines?'+ urllib.parse.urlencode(query_parameters)
+    new_request = requests.get(url, headers={'user-key' : ZOMATO_API_KEY})
+    if new_request.ok:
+        data = new_request.json()
+    return {c['cuisine']['cuisine_name']: c['cuisine']['cuisine_id'] for c in data['cuisines']}
 
 #Returns id number of given category name
 def get_category_id(category: str):
@@ -45,14 +49,22 @@ def get_city_id(city_name: str):
     return data['location_suggestions'][0]['id']
 
 #Returns list of lists of restaurants, one list per category
-def get_restaurants_in_city(city: str, categories: list):
+def get_restaurants_in_city(city: str, categories: list, sort = "rating", order = 'desc', cuisines = []):
+    cuis_ids = []
+    if len(cuisines) != 0:
+        cuis_dict = get_cuisine_dict(city)
+        for c in cuisines:
+            cuis_ids.append(str(cuis_dict[c]))
+    cuisine = ','.join(cuis_ids)
     cat_ids = []
     for c in categories:
         cat_ids.append(str(get_category_id(c)))
     restaurants_list = []
     for c in cat_ids:
         data = None
-        query_parameters = [('entity_id', get_city_id(city)), ('entity_type', 'city'), ('category', c), ('sort', 'rating'), ('count', 5)]
+        if(sort == "cost"):
+            order = "asc"
+        query_parameters = [('entity_id', get_city_id(city)), ('entity_type', 'city'), ('category', c), ('sort', sort), ('count', 6), ('order', order), ('cuisines', cuisine)]
         url = BASE_ZOMATO_URL + '/search?'+ urllib.parse.urlencode(query_parameters)
         new_request = requests.get(url, headers={'user-key' : ZOMATO_API_KEY})
         if new_request.ok:
@@ -72,4 +84,13 @@ for rl in restaurants:
         print('name:\t' + r.name + '\taddress:\t' + r.address + '\tscore:\t' + str(r.score))
     print()
     print()
+<<<<<<< HEAD
 '''
+=======
+'''
+#print(get_category_list())
+'''
+for k, v in get_cuisine_dict('Stockton').items():
+    print(k, v)
+    '''
+>>>>>>> f9b8babcc43b947f44b924b44ee7d17731f714cb
