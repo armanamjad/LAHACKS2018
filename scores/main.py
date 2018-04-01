@@ -62,16 +62,16 @@ def findClosestDestination(places: list, origin: Place, visitedPlaces):
     return closestPlace
 
 # removes locations that have a higher duration than duration passed   
-# def filterPlacesByDuration(places: list, origin: Place, duration: int):
-#     newPlaces = []
-#     
-#     for place in places:
-#         tempjsonFile = getResult(createUrl(origin.address, place.address))
-#         tempFoodTrip = FoodTrip(tempjsonFile)
-#         if tempFoodTrip.duration <= duration:
-#             newPlaces.append(place)
-#             
-#     return newPlaces
+def filterPlacesByDuration(places: list, origin: Place, duration: int):
+    newPlaces = []
+    
+    for place in places:
+        tempjsonFile = getResult(createUrl(origin.address, place.address))
+        tempFoodTrip = FoodTrip(tempjsonFile)
+        if tempFoodTrip.duration <= duration:
+            newPlaces.append(place)
+            
+    return newPlaces
 
 # def filterPlacesByMiles(places: list, origin: Place, miles: int):
 #     meters = miles * 1609.344
@@ -112,11 +112,6 @@ def processListData(data: list, origin,
         recentPlace = closestPlace
     return places
     
-def getLatLong(address):
-    tempjsonFile = getResult(createUrl(address, address))
-    tempFoodTrip = FoodTrip(tempjsonFile)
-    latlong = tempjsonFile['routes'][0]['legs'][0]['steps'][0]['start_location']
-    return latlong["lat"], latlong["lng"]
 
 def _test():
     startingPlace = Place("Starting point", "Fresno, CA")
@@ -145,22 +140,8 @@ def main():
     if _testing:
         _test()
     
-<<<<<<< HEAD
     refinedList = getRestaurants()
     for place in refinedList:
         print(place.name)
-=======
-#     categories = ["Breakfast", "Lunch", "Dinner"]
-#     listOflistOfPlaces = zomato_data.get_restaurants_in_city("Orange County", categories)
-#     startingPlace = Place("Location 1", 
-#                                   "1043 West Peltason Dr Irvine, CA")
-#     
-#     refinedList = processListData(listOflistOfPlaces, startingPlace)
-#     for place in refinedList:
-#         print(place.name)
-    lat, lng = getLatLong("5507 Don Rodolfo San Jose, CA")
-    print(lat, lng)
-
->>>>>>> f9b8babcc43b947f44b924b44ee7d17731f714cb
     
 main()

@@ -20,5 +20,12 @@ class Way(models.Model):
     m_path = models.CharField(max_length = 500)
     def __str__(self):
         return self.m_path
+    
+class use(models.Model):
+    m_loc = models.CharField(max_length = 500)
+    m_dis = models.IntegerField(default = 0)
+    def __str__(self):
+        return self.m_loc
+
 
 
